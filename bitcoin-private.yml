@@ -1,0 +1,45 @@
+networks:
+  bitcoinnetwork:
+    driver: bridge
+
+services:
+  bitcoin-core:
+    container_name: bitcoin-core
+    image: bitcoin/bitcoin:latest
+    command:
+      -printtoconsole
+      -regtest=1
+      -txindex
+      -rpcuser=admin
+      -rpcpassword=admin
+      -rpcallowip=0.0.0.0/0
+      -rpcbind=0.0.0.0
+      -server
+    volumes:
+      - bitcoin:/home/bitcoin/.bitcoin
+    ports:
+      - 18443:18443 
+    networks:
+      - bitcoinnetwork
+    healthcheck:
+      test: bitcoin-cli -regtest -rpcuser=admin -rpcpassword=admin  getmininginfo || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+     
+  miner:
+    build:
+      context: . 
+      dockerfile: ./miner.Dockerfile
+    command:
+      - admin
+      - admin
+      - bitcoin-core
+    depends_on:
+      bitcoin-core:
+        condition: service_healthy
+    networks:
+      - bitcoinnetwork
+
+volumes:
+  bitcoin:
