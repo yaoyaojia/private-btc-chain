@@ -27,10 +27,24 @@ services:
       timeout: 5s
       retries: 3
      
-  miner:
+  # miner:
+  #   build:
+  #     context: . 
+  #     dockerfile: ./miner.Dockerfile
+  #   command:
+  #     - admin
+  #     - admin
+  #     - bitcoin-core
+  #   depends_on:
+  #     bitcoin-core:
+  #       condition: service_healthy
+  #   networks:
+  #     - bitcoinnetwork
+
+  rpc-miner:
     build:
       context: . 
-      dockerfile: ./miner.Dockerfile
+      dockerfile: ./rpc-miner.Dockerfile
     command:
       - admin
       - admin
